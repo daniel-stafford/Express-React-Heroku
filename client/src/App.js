@@ -1,24 +1,18 @@
 import React from "react"
-import axios from "axios"
+import { useQuery } from "@apollo/react-hooks"
+import { ALL_EXPENSES } from "./graphql/queries"
 
-function App() {
-  const [user, setUser] = React.useState(null)
-
-  React.useEffect(() => {
-    axios.get("http://localhost:4000/api").then(response => {
-      setUser(response.data)
-    })
-  }, [])
+const App = () => {
+  const { loading, error, data } = useQuery(ALL_EXPENSES)
+  if (loading) return <p>Loading ...</p>
+  if (error) return `Error! ${error.message}`
 
   return (
-    user && (
-      <div className="App">
-        <header className="App-header">
-          <img src={user.user.avatar_url} className="App-logo" alt="logo" />
-          <p>{user.user.login}</p>
-        </header>
-      </div>
-    )
+    <div>
+      {data.expenses.map(e => (
+        <p key={e.id}>{e.title}</p>
+      ))}
+    </div>
   )
 }
 

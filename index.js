@@ -1,19 +1,31 @@
+require("dotenv").config()
 const express = require("express")
 const axios = require("axios")
 const cors = require("cors")
+const mongoose = require("mongoose")
+const { ApolloServer } = require("apollo-server-express")
+const typeDefs = require("./graphql/typeDefs.js")
+const resolvers = require("./graphql/resolvers")
 
 const app = express()
 app.use(cors())
 
-app.get("/api", async (req, res) => {
-  const user = req.query.user || "daniel-stafford"
-  try {
-    const response = await axios.get(`https://api.github.com/users/${user}`)
-    res.json({ user: response.data })
-  } catch (e) {
-    console.log("error with github get", e.message)
-  }
-})
+const url = process.env.MONGODB_URI
+
+mongoose
+  .connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("connected to MongoDB")
+  })
+  .catch(error => {
+    console.log("error connection to MongoDB:", error.message)
+  })
+
+const server = new ApolloServer({ typeDefs, resolvers })
+server.applyMiddleware({ app })
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"))
