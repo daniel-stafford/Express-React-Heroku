@@ -10,7 +10,7 @@ const App = () => {
   return (
     <div>
       {data.expenses.map(e => (
-        <p key={e.id}>{e.title}</p>
+        <p key={e.id}>{e.title}!</p>
       ))}
     </div>
   )
